@@ -35,7 +35,8 @@ class Worker:
         # return the last received header (through control) if any, and body
         return header, received_bytes
 
-    def send(self, payload: Optional[Union[bytes, memoryview]] = None, header: Optional[Union[str,Any]] = None):
+    def send(self, payload: Optional[Union[bytes, memoryview]] = None, 
+             header: Optional[Union[str,Any]] = None):
         if header is None:
             header_data = ""
         elif not isinstance(header, str):
@@ -58,7 +59,7 @@ class Worker:
     def stop(self):
         self.send(header=constants.WORKER_STOP_MESSAGE.encode("utf-8"))
 
-    def _handle_control(self, received_bytes: Optional[memoryview], flags: Optional[int]) -> (bool, Union[memoryview,Any]):
+    def _handle_control(self, received_bytes: Optional[memoryview], flags: int = 0) -> (bool, Union[memoryview,Any]):
 
         if received_bytes is None or flags & PayloadType.PAYLOAD_RAW:
             return True, received_bytes

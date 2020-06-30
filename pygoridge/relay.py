@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Optional
 
 from pygoridge.constants import PREFIX_LENGTH, BUFFER_SIZE, PayloadType
 from pygoridge.protocol import parse_prefix, pack_message
@@ -34,12 +33,12 @@ class Relay(ABC):
         bytes_length = self._read(view)
         return view, prefix["flags"]
 
-    def send(self, payload: memoryview, flags: Optional[int] = None) -> 'Relay':
+    def send(self, payload: memoryview, flags: int = 0) -> 'Relay':
         data = self._prepare_send(payload, flags)
         self._write(data)
         return self
 
-    def _prepare_send(self, payload: memoryview, flags: Optional[int] = None) -> memoryview:
+    def _prepare_send(self, payload: memoryview, flags: int = 0) -> memoryview:
         package = pack_message(payload, flags)
         if package is None:
             raise TransportException('unable to send payload with PAYLOAD_NONE flag')

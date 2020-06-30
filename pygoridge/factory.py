@@ -18,7 +18,7 @@ def create_relay(connection: str) -> Relay:
     if m.string == Relay.STREAM:
         return StreamRelay(sys.stdin.buffer.raw, sys.stdout.buffer.raw)
     elif m.group("protocol") == Relay.TCP_SOCKET:
-        return SocketRelay(m.group("address"), port=m.group("port"), 
+        return SocketRelay(m.group("address"), port=int(m.group("port")), 
                            socket_type=SocketType.SOCK_TCP)
     elif m.group("protocol") == Relay.UNIX_SOCKET:
         return SocketRelay(m.group("address"), socket_type=SocketType.SOCK_UNIX)

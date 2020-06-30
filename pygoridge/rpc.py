@@ -1,5 +1,5 @@
 import struct
-from typing import Optional, Union, Any
+from typing import Union, Any
 
 from pygoridge.constants import PREFIX_LENGTH, PayloadType
 from pygoridge.exceptions import ServiceException, TransportException
@@ -16,21 +16,21 @@ class RPC:
         self._json_decoder = json_decoder
 
 
-    def __call__(method: str, payload, flags: Optional[int] = 0):
-        method = method.encode("utf-8")
-        header_size = len(method) + 8
+    def __call__(self, method: str, payload, flags: int = 0):
+        method_bytes = method.encode("utf-8")
+        header_size = len(method_bytes) + 8
         header = memoryview(bytearray(header_size))
-        header[:len(method)] = method
-        struct.pack_into('<Q', header, len(method), self._seq)
+        header[:len(method_bytes)] = method_bytes
+        struct.pack_into('<Q', header, len(method_bytes), self._seq)
 
         self._relay.send(header, PayloadType.PAYLOAD_CONTROL | PayloadType.PAYLOAD_RAW)
 
         if flags & PayloadType.PAYLOAD_RAW and isinstance(payload, str):
-            payload_data = payload.encode("utf-8")
+            payload_data = memoryview(payload.encode("utf-8"))
             self._relay.send(payload_data, flags)
         else:
             try:
-                body = self._json_encoder(payload).encode("utf-8")
+                body = memoryview(self._json_encoder(payload).encode("utf-8"))
             except Exception as e:
                 raise ServiceException(f"error while encoding to json: {str(e)}")
             self._relay.send(body)
@@ -40,15 +40,16 @@ class RPC:
         if not flags & PayloadType.PAYLOAD_CONTROL:
             raise TransportException('rpc response header is missing')
 
-        response_seq = struct.unpack('<Q', response[-8:])
+        response = response.tobytes()
+        response_seq = struct.unpack('<Q', response[-8:])[0]
         response_method = response[:-8].decode("utf-8")
 
         if response_seq != self._seq or response_method != method:
             raise TransportException(f"rpc method call, expected {self._seq}:{method}, got {response_seq}:{response_method}")
 
         self._seq += 1
-
-        return self._handle_body(self._relay.receive_sync())
+        body, flags = self._relay.receive_sync()
+        return self._handle_body(body, flags)
 
     def _handle_body(self, body: memoryview, flags: int) -> Union[memoryview, Any]:
         if flags & PayloadType.PAYLOAD_ERROR and flags & PayloadType.PAYLOAD_RAW:
@@ -57,4 +58,4 @@ class RPC:
         if flags & PayloadType.PAYLOAD_RAW:
             return body
 
-        return self._json_decoder(memoryview.tobytes())
+        return self._json_decoder(body.tobytes())

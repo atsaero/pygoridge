@@ -4,10 +4,10 @@ from typing import Optional
 from pygoridge.constants import PREFIX_LENGTH, PayloadType
 
 
-def pack_message(payload: memoryview, flags: Optional[int] = None) -> Optional[dict]:
+def pack_message(payload: memoryview, flags: int = 0) -> Optional[dict]:
     size = len(payload)
     
-    if flags is not None and flags & PayloadType.PAYLOAD_NONE and size != 0:
+    if flags & PayloadType.PAYLOAD_NONE and size != 0:
         return
     
     buff = memoryview(bytearray(PREFIX_LENGTH + size))

@@ -1,4 +1,5 @@
 import io
+import socket
 from typing import Optional
 
 from pygoridge.exceptions import (PrefixException, TransportException, 
@@ -27,6 +28,7 @@ class SocketRelay(Relay):
         self._port = port
         self._socket_type = socket_type
         self._sock = None
+        self._is_connected = False
 
     def __str__(self):
         if self._socket_type == SocketType.SOCK_TCP:
@@ -38,6 +40,7 @@ class SocketRelay(Relay):
         if self.is_connected:
             self.close()
 
+    @property
     def is_connected(self):
         return self._sock is not None
 
@@ -53,24 +56,15 @@ class SocketRelay(Relay):
     def socket_type(self) -> int:
         return self._socket_type
 
-    def send_package(self, header_payload: str, body_payload: str,
-                     header_flags: Optional[int] = None, 
-                     body_flags: Optional[int] = None) -> 'SocketRelay':
-        self._connect()
-        return super().send_package(header_payload=header_payload, 
-            body_payload=body_payload, header_flags=header_flags, body_flags=body_flags)
-
-    def send(self, payload: str, flags: Optional[int] = None) -> 'SocketRelay':
-        self._connect()
-        return super().send(payload, flags)
-
     def close(self):
         if not self.is_connected:
             raise RelayException(f"unable to close socket '{self}', socket already closed")
-        self._sock.close()
+        if self._sock is not None:
+            self._sock.close()
         self._sock = None
 
     def _read(self, buffer: memoryview) -> int:
+        self._connect()
         view = buffer
         size = 0
         try:
@@ -79,14 +73,15 @@ class SocketRelay(Relay):
                 view = view[n:] 
                 size += n
         except Exception as e:
-            raise TransportException(f"unable to read from socket {self}")
+            raise TransportException(f"unable to read from socket {self}: {str(e)}")
         return size
 
     def _write(self, buffer: memoryview):
+        self._connect()
         try:
             self._sock.sendall(buffer)
         except Exception as e:
-            raise TransportException(f"unable to write to socket {self}")
+            raise TransportException(f"unable to write to socket {self}: {str(e)}")
 
     def _connect(self):
         if self.is_connected:
@@ -95,6 +90,7 @@ class SocketRelay(Relay):
             if self._socket_type == SocketType.SOCK_TCP:
                 self._sock = socket.create_connection((self._address, self._port), timeout=10)
                 self._sock.settimeout(None)
+
             elif self._socket_type == SocketType.SOCK_UNIX:
                 self._sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
                 self._sock.connect(self._address)
