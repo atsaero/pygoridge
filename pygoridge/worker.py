@@ -59,7 +59,7 @@ class Worker:
     def stop(self):
         self.send(header=constants.WORKER_STOP_MESSAGE.encode("utf-8"))
 
-    def _handle_control(self, received_bytes: Optional[memoryview], flags: int = 0) -> (bool, Union[memoryview,Any]):
+    def _handle_control(self, received_bytes: Optional[memoryview] = None, flags: int = 0) -> (bool, Union[memoryview,Any]):
 
         if received_bytes is None or flags & PayloadType.PAYLOAD_RAW:
             return True, received_bytes
@@ -69,7 +69,7 @@ class Worker:
         except Exception as e:
             raise WorkerException(f"invalid task context, JSON payload is expected: {str(e)}")
 
-        # PID negotiation (socket connections only)
+        # PID negotiation (for pipes)
         if p.get("pid"):
             pid_msg = '{"pid":%s}' % os.getpid()
             self._relay.send(memoryview(pid_msg.encode("utf-8")), PayloadType.PAYLOAD_CONTROL)
