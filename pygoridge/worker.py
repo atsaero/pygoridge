@@ -1,7 +1,7 @@
 import os
 from typing import Optional, Union, Any
 
-from pygoridge.constants import PayloadType
+from pygoridge.constants import PayloadType, WORKER_STOP_MESSAGE
 from pygoridge.exceptions import WorkerException
 from pygoridge.json import json_loads, json_dumps
 from pygoridge.relay import Relay
@@ -57,7 +57,7 @@ class Worker:
         self._relay.send(memoryview(message.encode("utf-8")), PayloadType.PAYLOAD_CONTROL | PayloadType.PAYLOAD_RAW | PayloadType.PAYLOAD_ERROR)
 
     def stop(self):
-        self.send(header=constants.WORKER_STOP_MESSAGE.encode("utf-8"))
+        self.send(header=WORKER_STOP_MESSAGE.encode("utf-8"))
 
     def _handle_control(self, received_bytes: Optional[memoryview] = None, flags: int = 0) -> (bool, Union[memoryview,Any]):
 
