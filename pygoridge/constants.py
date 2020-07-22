@@ -9,4 +9,4 @@ class PayloadType:
     PAYLOAD_CONTROL = 16
 
 
-WORKER_STOP_MESSAGE = '{"stop":true}'
+WORKER_STOP_MESSAGE = {"stop": True}

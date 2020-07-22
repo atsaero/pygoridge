@@ -1,4 +1,5 @@
 import os
+import json
 from typing import Optional, Union, Any
 
 from pygoridge.constants import PayloadType, WORKER_STOP_MESSAGE
@@ -43,7 +44,7 @@ class Worker:
             header_data = self._json_encoder(header)
 
         header_data = header_data.encode("utf-8")
-        payload = memoryview(payload)
+        payload = memoryview(payload or b"")
 
         if header is None:
             header_flags = PayloadType.PAYLOAD_CONTROL | PayloadType.PAYLOAD_NONE
@@ -51,13 +52,13 @@ class Worker:
             header_flags = PayloadType.PAYLOAD_CONTROL | PayloadType.PAYLOAD_RAW
 
         self._relay.send(header_data, header_flags)
-        self._relay.send(payload or b"", PayloadType.PAYLOAD_RAW)
+        self._relay.send(payload, PayloadType.PAYLOAD_RAW)
 
     def error(self, message: str):
         self._relay.send(memoryview(message.encode("utf-8")), PayloadType.PAYLOAD_CONTROL | PayloadType.PAYLOAD_RAW | PayloadType.PAYLOAD_ERROR)
 
     def stop(self):
-        self.send(header=WORKER_STOP_MESSAGE.encode("utf-8"))
+        self.send(header=WORKER_STOP_MESSAGE)
 
     def _handle_control(self, received_bytes: Optional[memoryview] = None, flags: int = 0) -> (bool, Union[memoryview,Any]):
 
