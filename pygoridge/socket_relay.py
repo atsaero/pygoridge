@@ -16,8 +16,11 @@ class SocketRelay(Relay):
 
     def __init__(self, address: str, port: Optional[int] = None, 
                  socket_type: int = SocketType.SOCK_TCP):
+        self._sock = None
+        self._is_connected = False
+
         if socket_type == SocketType.SOCK_TCP:
-            if port is None or 65535 < port < 1:
+            if port is None or 65535 < port or port < 0:
                 raise InvalidArgumentException(f"no port given for TPC socket on {address}")
         elif socket_type == SocketType.SOCK_UNIX:
             pass
@@ -27,8 +30,7 @@ class SocketRelay(Relay):
         self._address = address
         self._port = port
         self._socket_type = socket_type
-        self._sock = None
-        self._is_connected = False
+        
 
     def __str__(self):
         if self._socket_type == SocketType.SOCK_TCP:
@@ -42,7 +44,7 @@ class SocketRelay(Relay):
 
     @property
     def is_connected(self):
-        return self._sock is not None
+        return self._is_connected
 
     @property
     def address(self) -> str:
@@ -62,6 +64,7 @@ class SocketRelay(Relay):
         if self._sock is not None:
             self._sock.close()
         self._sock = None
+        self._is_connected = False
 
     def _read(self, buffer: memoryview) -> int:
         self._connect()
@@ -83,6 +86,9 @@ class SocketRelay(Relay):
         except Exception as e:
             raise TransportException(f"unable to write to socket {self}: {str(e)}")
 
+    def connect(self):
+        return self._connect()
+
     def _connect(self):
         if self.is_connected:
             return
@@ -96,3 +102,5 @@ class SocketRelay(Relay):
                 self._sock.connect(self._address)
         except Exception as e:
             raise TransportException(f"unable to establish connection {self}: {str(e)}")
+        else:
+            self._is_connected = True

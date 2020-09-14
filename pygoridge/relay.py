@@ -27,7 +27,7 @@ class Relay(ABC):
         if prefix['size'] == 0:
             return b"", prefix['flags']
 
-        buf = bytearray(min(prefix['size'], BUFFER_SIZE))
+        buf = bytearray(prefix['size'])#bytearray(min(prefix['size'], BUFFER_SIZE))
         view = memoryview(buf)
         
         bytes_length = self._read(view)

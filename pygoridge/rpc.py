@@ -28,6 +28,9 @@ class RPC:
         if flags & PayloadType.PAYLOAD_RAW and isinstance(payload, str):
             payload_data = memoryview(payload.encode("utf-8"))
             self._relay.send(payload_data, flags)
+        elif flags & PayloadType.PAYLOAD_RAW and (isinstance(payload, bytearray) or isinstance(payload, bytes)):
+            payload_data = memoryview(payload)
+            self._relay.send(payload_data, flags)
         else:
             try:
                 body = memoryview(self._json_encoder(payload).encode("utf-8"))
@@ -53,7 +56,7 @@ class RPC:
 
     def _handle_body(self, body: memoryview, flags: int) -> Union[memoryview, Any]:
         if flags & PayloadType.PAYLOAD_ERROR and flags & PayloadType.PAYLOAD_RAW:
-            raise ServiceException(f"error handling rpc response body")
+            raise ServiceException(f"error handling rpc response body: {body.tobytes().decode('utf-8')}")
 
         if flags & PayloadType.PAYLOAD_RAW:
             return body

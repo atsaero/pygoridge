@@ -1,0 +1,3 @@
+[submodule "goridge"]
+	path = goridge
+	url = git://github.com/spiral/goridge.git
