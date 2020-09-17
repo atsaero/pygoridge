@@ -62,3 +62,12 @@ class RPC:
             return body
 
         return self._json_decoder(body.tobytes())
+
+    def close(self):
+        self._relay.close()
+
+    def __enter__(self): 
+        return self
+      
+    def __exit__(self, exc_type, exc_value, exc_traceback): 
+        self.close()

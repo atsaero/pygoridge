@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from pygoridge.constants import PREFIX_LENGTH, BUFFER_SIZE, PayloadType
+from pygoridge.constants import PREFIX_LENGTH, PayloadType
 from pygoridge.protocol import parse_prefix, pack_message
 
 
@@ -27,7 +27,7 @@ class Relay(ABC):
         if prefix['size'] == 0:
             return b"", prefix['flags']
 
-        buf = bytearray(prefix['size'])#bytearray(min(prefix['size'], BUFFER_SIZE))
+        buf = bytearray(prefix['size'])
         view = memoryview(buf)
         
         bytes_length = self._read(view)
@@ -50,3 +50,9 @@ class Relay(ABC):
         prefix_view = memoryview(prefix)
         self._read(prefix_view)
         return parse_prefix(prefix_view)
+
+    def __enter__(self): 
+        return self
+      
+    def __exit__(self, exc_type, exc_value, exc_traceback): 
+        self.close()

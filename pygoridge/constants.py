@@ -1,5 +1,4 @@
 PREFIX_LENGTH = 17
-BUFFER_SIZE = 65536
 
 
 class PayloadType:

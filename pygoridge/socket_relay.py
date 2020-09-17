@@ -42,6 +42,10 @@ class SocketRelay(Relay):
         if self.is_connected:
             self.close()
 
+    def __enter__(self):
+        self._connect()
+        return self
+
     @property
     def is_connected(self):
         return self._is_connected
@@ -60,7 +64,7 @@ class SocketRelay(Relay):
 
     def close(self):
         if not self.is_connected:
-            raise RelayException(f"unable to close socket '{self}', socket already closed")
+            return
         if self._sock is not None:
             self._sock.close()
         self._sock = None

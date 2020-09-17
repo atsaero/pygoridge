@@ -2,10 +2,12 @@ import datetime
 import random
 from unittest import TestCase
 
-from pygoridge.constants import BUFFER_SIZE, PayloadType
+from pygoridge.constants import PayloadType
 from pygoridge.exceptions import ServiceException
-from pygoridge.socket_relay import SocketType, SocketRelay
-from pygoridge.rpc import RPC
+from pygoridge import RPC, SocketType, SocketRelay
+
+
+BUFFER_SIZE = 65536
 
 
 class CommonTests:
@@ -149,4 +151,11 @@ class CommonTests:
 
 
 class RPCTest(TestCase, CommonTests):
-    pass
+    
+    def test_context_manager(self):
+        relay = self.make_relay()
+        with RPC(relay) as conn:
+            self.assertEqual("pong", conn("Service.Ping", "ping"))
+            self.assertTrue(relay.is_connected)
+
+        self.assertFalse(relay.is_connected)

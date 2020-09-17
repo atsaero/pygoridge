@@ -1,9 +1,7 @@
 from unittest import TestCase
 
 from pygoridge.exceptions import RelayFactoryException
-from pygoridge.factory import create_relay
-from pygoridge.socket_relay import SocketRelay, SocketType
-from pygoridge.stream_relay import StreamRelay
+from pygoridge import create_relay, SocketRelay, SocketType, StreamRelay
 
 
 class RelayFactoryTest(TestCase):
