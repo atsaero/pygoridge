@@ -1,21 +1,19 @@
 #TODO
 * setup.py, cythonize
-* tests + worker tests
 * class annotations with examples
-* python f-expressions are evaluated??
-* проверить утечки памяти (memory view release)
-* проверить rpc и worker.error
 * README
 
 
 ## RoadRunner usage
 
 worker class
+use your own json encoder/decoder
 
 
 ## Run tests
 
 ```bash
 docker-compose -f ./goridge/tests/docker-compose.yml up
+docker-compose -f tests/rr_test_app/docker-compose.yml up --build
 python3 -m unittest discover -s tests
 ```

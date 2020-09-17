@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  rr:
+    container_name: rr
+    build:
+      context: ../..
+      dockerfile: ./tests/rr_test_app/Dockerfile
+    ports: ["7080:7080"]
+    command: ["/app/server"]

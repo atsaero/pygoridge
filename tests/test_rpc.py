@@ -10,7 +10,6 @@ from pygoridge.rpc import RPC
 
 class CommonTests:
 
-    GO_APP = "server"
     SOCK_ADDR = "0.0.0.0"
     SOCK_PORT = 7079
     SOCK_TYPE = SocketType.SOCK_TCP
