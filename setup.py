@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
+import os.path
 from setuptools import setup, find_packages
+
+
+def get_description():
+    README = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'README.md')
+    with open(README, 'r') as f:
+        return f.read()
 
 
 setup(
@@ -8,8 +15,8 @@ setup(
     author='Maksim Ryndin',
     author_email='ryndin@atsaero.ru',
     url='https://github.com/atsaero/pygoridge',
-    description='Python client for Goridge',
-
+    description='Python-Golang IPC bridge, python client for Goridge',
+    long_description=get_description(),
     license='MIT',
     packages=find_packages(exclude=("tests", "examples", "goridge")),
     zip_safe=False,

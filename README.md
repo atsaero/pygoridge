@@ -1,4 +1,4 @@
-Pygoridge: Python-to-Golang IPC bridge
+Pygoridge: Python-to-Golang IPC bridge, python client for Goridge
 =================================================
 [![GoDoc](https://godoc.org/github.com/spiral/goridge?status.svg)](https://godoc.org/github.com/spiral/goridge)
 
