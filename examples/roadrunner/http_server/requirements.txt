@@ -1,0 +1,2 @@
+ujson==3.0.0
+pygoridge==1.0.0

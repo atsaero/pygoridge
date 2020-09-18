@@ -25,7 +25,7 @@ class Relay(ABC):
     def receive_sync(self) -> (memoryview, int):
         prefix = self._fetch_prefix()
         if prefix['size'] == 0:
-            return b"", prefix['flags']
+            return memoryview(b""), prefix['flags']
 
         buf = bytearray(prefix['size'])
         view = memoryview(buf)

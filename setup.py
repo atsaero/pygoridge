@@ -4,17 +4,17 @@ from setuptools import setup, find_packages
 
 setup(
     name='pygoridge',
-    version='1.0.0',
+    version='0.1.0',
     author='Maksim Ryndin',
     author_email='ryndin@atsaero.ru',
-    url='TODO',
+    url='https://github.com/atsaero/pygoridge',
     description='Python client for Goridge',
 
     license='MIT',
-    packages=find_packages(exclude=("tests", "examples")),
+    packages=find_packages(exclude=("tests", "examples", "goridge")),
     zip_safe=False,
     classifiers=[
-        'Development Status :: 5 - Production/Stable',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'Intended Audience :: Information Technology',
         'Natural Language :: Russian',

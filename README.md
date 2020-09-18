@@ -25,8 +25,8 @@ $ go get "github.com/spiral/goridge"
 $ pip install pygoridge
 ```
 
-Example
---------
+Example - python client calls go server methods
+-----------------------------------------------
 ```python3
 from pygoridge import create_relay, RPC, SocketRelay
 
@@ -42,7 +42,7 @@ rpc.close()     # close underlying socket connection
 
 # or using as a context manager
 with RPC(tcp_relay) as rpc:
-    print(rpc("App.Hi", "Antony"))
+    print(rpc("App.Hi", "Antony, again"))
 ```
 
 ```go
@@ -50,7 +50,7 @@ package main
 
 import (
     "fmt"
-    "github.com/spiral/goridge/v2"
+    "github.com/spiral/goridge"
     "net"
     "net/rpc"
 )
@@ -80,6 +80,74 @@ func main() {
 }
 ```
 
+Example - go http server (RoadRunner) with python workers
+---------------------------------------------------------
+
+You can download latest RoadRunner binary from [releases page](https://github.com/spiral/roadrunner/releases).
+
+See also [`examples`](./examples).
+
+```sh
+cd examples/roadrunner/http_server/
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Worker class
+
+```python3
+from functools import partial
+
+import ujson
+from pygoridge import create_relay, Worker, RPC
+
+
+json_dumps = partial(ujson.dumps, ensure_ascii=False, escape_forward_slashes=False)
+json_loads = ujson.loads
+
+
+class HTTPWorker(Worker):
+
+    def hello(self, headers):
+        # You can call some CPU-intensive function here
+        return headers, {}
+
+
+if __name__ == "__main__":
+    rl = create_relay("pipes")
+    worker = HTTPWorker(rl, json_encoder=json_dumps, json_decoder=json_loads)
+
+    while True:
+        context, body = worker.receive()
+        if context is None:
+            continue
+        http_headers = json_loads(context.tobytes())
+        response, response_headers = worker.hello(http_headers)
+        worker.send(
+           json_dumps(response).encode("utf-8"),
+           response_headers 
+        )
+
+```
+
+Run RoadRunner server
+```sh
+cd examples/roadrunner/http_server/
+./rr serve -d -v
+```
+
+Make http request to get request headers back as response body
+```sh
+curl 'http://localhost:8080/' --compressed
+```
+
+RoadRunner is highly customizable and extendable so you can even write your own plugin for it with required API protocol (see for example [php-grpc server](https://github.com/spiral/php-grpc)).
+
+
+Custom encoders/decoders for faster json processing
+---------------------------------------------------
+
 ```python3
 from pygoridge.json import json_dumps, json_loads
 
@@ -87,8 +155,6 @@ from pygoridge.json import json_dumps, json_loads
 # you can also provide custom json encoder for faster marshalling
 rpc = RPC(tcp_relay, json_encoder=json_dumps, json_decoder=json_loads)
 ```
-
-See also [`examples`](./examples) for more examples (also with RoadRunner).
  
 License
 -------
@@ -106,8 +172,3 @@ docker-compose -f ./goridge/tests/docker-compose.yml up
 docker-compose -f tests/rr_test_app/docker-compose.yml up
 python3 -m unittest discover -s tests
 ```
-
-## TODO
-- examples directory
-- example with RR
-- custom json encoder for Worker

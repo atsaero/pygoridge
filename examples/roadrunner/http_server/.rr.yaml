@@ -1,0 +1,12 @@
+# http service configuration.
+http:
+  # http host to listen.
+  address: 0.0.0.0:8080
+
+  # http worker pool configuration.
+  workers:
+    # python worker command.
+    command:  "python3 worker.py"
+
+    # connection method (pipes, tcp://:9000, unix://socket.unix). default "pipes"
+    relay:    "pipes"
