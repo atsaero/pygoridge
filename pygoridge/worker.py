@@ -1,5 +1,4 @@
 import os
-import json
 from typing import Optional, Union, Any
 
 from pygoridge.constants import PayloadType, WORKER_STOP_MESSAGE
@@ -10,7 +9,11 @@ from pygoridge.relay import Relay
 
 class Worker:
 
-    def __init__(self, relay: Relay, json_encoder=json_dumps, json_decoder=json_loads):
+    def __init__(
+                 self,
+                 relay: Relay,
+                 json_encoder=json_dumps,
+                 json_decoder=json_loads):
         self._relay = relay
         self._json_decoder = json_decoder
         self._json_encoder = json_encoder
@@ -18,7 +21,10 @@ class Worker:
     def receive(self) -> (Optional[memoryview], Optional[memoryview]):
         return self._receive()
 
-    def _receive(self, header: Optional[Union[str, Any]] = None) -> (Optional[memoryview], Optional[memoryview]):
+    def _receive(
+                 self,
+                 header: Optional[Union[str, Any]] = None
+                 ) -> (Optional[memoryview], Optional[memoryview]):
         received_bytes, flags = self._relay.receive_sync()
 
         if flags & PayloadType.PAYLOAD_CONTROL:
@@ -31,13 +37,14 @@ class Worker:
                 return None, None
 
         if flags & PayloadType.PAYLOAD_ERROR:
-            raise WorkerException(f'got error: {received_bytes.decode("utf-8")}')
+            raise WorkerException(
+                f'got error: {received_bytes.decode("utf-8")}')
 
         # return the last received header (through control) if any, and body
         return header, received_bytes
 
-    def send(self, payload: Optional[Union[bytes, memoryview]] = None, 
-             header: Optional[Union[str,Any]] = None):
+    def send(self, payload: Optional[Union[bytes, memoryview]] = None,
+             header: Optional[Union[str, Any]] = None):
         if header is None:
             header_data = ""
         elif not isinstance(header, str):
@@ -55,12 +62,18 @@ class Worker:
         self._relay.send(payload, PayloadType.PAYLOAD_RAW)
 
     def error(self, message: str):
-        self._relay.send(memoryview(message.encode("utf-8")), PayloadType.PAYLOAD_CONTROL | PayloadType.PAYLOAD_RAW | PayloadType.PAYLOAD_ERROR)
+        self._relay.send(
+            memoryview(message.encode("utf-8")),
+            PayloadType.PAYLOAD_CONTROL | PayloadType.PAYLOAD_RAW | PayloadType.PAYLOAD_ERROR
+        )
 
     def stop(self):
         self.send(header=WORKER_STOP_MESSAGE)
 
-    def _handle_control(self, received_bytes: Optional[memoryview] = None, flags: int = 0) -> (bool, Union[memoryview,Any]):
+    def _handle_control(
+            self,
+            received_bytes: Optional[memoryview] = None,
+            flags: int = 0) -> (bool, Union[memoryview, Any]):
 
         if received_bytes is None or flags & PayloadType.PAYLOAD_RAW:
             return True, received_bytes
@@ -68,12 +81,15 @@ class Worker:
         try:
             p = self._json_decoder(received_bytes.tobytes())
         except Exception as e:
-            raise WorkerException(f"invalid task context, JSON payload is expected: {str(e)}")
+            raise WorkerException(
+                f"invalid task context, JSON payload is expected: {str(e)}")
 
         # PID negotiation (for pipes)
         if p.get("pid"):
             pid_msg = '{"pid":%s}' % os.getpid()
-            self._relay.send(memoryview(pid_msg.encode("utf-8")), PayloadType.PAYLOAD_CONTROL)
+            self._relay.send(
+                memoryview(pid_msg.encode("utf-8")), PayloadType.PAYLOAD_CONTROL
+            )
 
         if p.get("stop"):
             return False, p

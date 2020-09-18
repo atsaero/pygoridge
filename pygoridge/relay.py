@@ -1,14 +1,15 @@
 from abc import ABC, abstractmethod
 
-from pygoridge.constants import PREFIX_LENGTH, PayloadType
+from pygoridge.constants import PREFIX_LENGTH
+from pygoridge.exceptions import TransportException
 from pygoridge.protocol import parse_prefix, pack_message
 
 
 class Relay(ABC):
 
-    TCP_SOCKET  = 'tcp'
+    TCP_SOCKET = 'tcp'
     UNIX_SOCKET = 'unix'
-    STREAM      = 'pipes'
+    STREAM = 'pipes'
 
     @abstractmethod
     def close(self):
@@ -29,8 +30,8 @@ class Relay(ABC):
 
         buf = bytearray(prefix['size'])
         view = memoryview(buf)
-        
-        bytes_length = self._read(view)
+
+        self._read(view)
         return view, prefix["flags"]
 
     def send(self, payload: memoryview, flags: int = 0) -> 'Relay':
@@ -41,9 +42,10 @@ class Relay(ABC):
     def _prepare_send(self, payload: memoryview, flags: int = 0) -> memoryview:
         package = pack_message(payload, flags)
         if package is None:
-            raise TransportException('unable to send payload with PAYLOAD_NONE flag')
+            raise TransportException(
+                'unable to send payload with PAYLOAD_NONE flag')
 
-        return package['body'][:(PREFIX_LENGTH + package['size'])]    
+        return package['body'][:(PREFIX_LENGTH + package['size'])]
 
     def _fetch_prefix(self) -> dict:
         prefix = bytearray(PREFIX_LENGTH)
@@ -51,8 +53,8 @@ class Relay(ABC):
         self._read(prefix_view)
         return parse_prefix(prefix_view)
 
-    def __enter__(self): 
+    def __enter__(self):
         return self
-      
-    def __exit__(self, exc_type, exc_value, exc_traceback): 
+
+    def __exit__(self, exc_type, exc_value, exc_traceback):
         self.close()

@@ -2,14 +2,15 @@ import struct
 from typing import Optional
 
 from pygoridge.constants import PREFIX_LENGTH, PayloadType
+from pygoridge.exceptions import PrefixException
 
 
 def pack_message(payload: memoryview, flags: int = 0) -> Optional[dict]:
     size = len(payload)
-    
+
     if flags & PayloadType.PAYLOAD_NONE and size != 0:
         return
-    
+
     buff = memoryview(bytearray(PREFIX_LENGTH + size))
     # unsigned char
     struct.pack_into('>B', buff, 0, flags)

@@ -1,13 +1,13 @@
 import io
-from typing import Optional
 
-from pygoridge.exceptions import PrefixException, TransportException, InvalidArgumentException
+from pygoridge.exceptions import TransportException, InvalidArgumentException
 from pygoridge.relay import Relay
 
 
 class StreamRelay(Relay):
 
-    def __init__(self, input_stream: io.RawIOBase, output_stream: io.RawIOBase):
+    def __init__(self, input_stream: io.RawIOBase,
+                 output_stream: io.RawIOBase):
 
         if not input_stream.readable():
             raise InvalidArgumentException("`input_stream` must be readable")
@@ -25,7 +25,8 @@ class StreamRelay(Relay):
         try:
             read_bytes = self._in.read(len(buffer))
         except Exception as e:
-            raise TransportException(f"error reading payload from the stream: {str(e)}")
+            raise TransportException(
+                f"error reading payload from the stream: {str(e)}")
 
         if read_bytes is None:
             raise TransportException("error reading payload from the stream")
@@ -35,6 +36,8 @@ class StreamRelay(Relay):
     def _write(self, buffer: memoryview):
         try:
             if self._out.write(buffer) is None:
-                raise TransportException("no single byte could be readily written to stream")
+                raise TransportException(
+                    "no single byte could be readily written to stream")
         except Exception as e:
-            raise TransportException(f'unable to write payload to the stream: {str(e)}')
+            raise TransportException(
+                f'unable to write payload to the stream: {str(e)}')

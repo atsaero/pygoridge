@@ -167,7 +167,14 @@ Development
 ### Run tests
 
 ```sh
-docker-compose -f ./goridge/tests/docker-compose.yml up
-docker-compose -f tests/rr_test_app/docker-compose.yml up
+docker-compose -f ./goridge/tests/docker-compose.yml up -d
+docker-compose -f tests/rr_test_app/docker-compose.yml up -d
 python3 -m unittest discover -s tests
+```
+
+### Run linter
+
+```
+pip install flake8
+flake8 pygoridge
 ```
