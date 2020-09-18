@@ -4,7 +4,7 @@ Pygoridge: Python-to-Golang IPC bridge
 
 
 Pygoridge is a Python-to-Golang codec library which works over sockets and Golang net/rpc package.
-This is a python port of excellent [Goridge](https://github.com/spiral/goridge) library.
+This is a python port of php client for an excellent [Goridge](https://github.com/spiral/goridge) library.
 The library allows you to call Go service methods from Python with minimal footprint, structures and `[]byte` support.
 
 
@@ -24,8 +24,8 @@ $ go get "github.com/spiral/goridge"
 $ pip install pygoridge
 ```
 
-Example - python client calls go server methods
------------------------------------------------
+Example: python client calls go server methods
+----------------------------------------------
 ```python
 from pygoridge import create_relay, RPC, SocketRelay
 
@@ -79,8 +79,8 @@ func main() {
 }
 ```
 
-Example - go http server (RoadRunner) with python workers
----------------------------------------------------------
+Example: go http server (RoadRunner) with python workers
+--------------------------------------------------------
 
 You can download latest RoadRunner binary from [releases page](https://github.com/spiral/roadrunner/releases).
 
@@ -164,7 +164,7 @@ The MIT License (MIT). Please see [`LICENSE`](./LICENSE) for more information.
 Development
 -----------
 
-## Run tests
+### Run tests
 
 ```sh
 docker-compose -f ./goridge/tests/docker-compose.yml up
