@@ -1,6 +1,5 @@
-Python-to-Golang IPC bridge
+Pygoridge: Python-to-Golang IPC bridge
 =================================================
-[![Latest Stable Version](https://poser.pugx.org/spiral/goridge/v/stable)](https://packagist.org/packages/spiral/goridge) 
 [![GoDoc](https://godoc.org/github.com/spiral/goridge?status.svg)](https://godoc.org/github.com/spiral/goridge)
 
 
@@ -27,7 +26,7 @@ $ pip install pygoridge
 
 Example - python client calls go server methods
 -----------------------------------------------
-```python3
+```python
 from pygoridge import create_relay, RPC, SocketRelay
 
 rpc = RPC(SocketRelay("127.0.0.1", 6001))
@@ -96,7 +95,7 @@ pip install -r requirements.txt
 
 Worker class
 
-```python3
+```python
 from functools import partial
 
 import ujson
@@ -137,7 +136,7 @@ cd examples/roadrunner/http_server/
 ./rr serve -d -v
 ```
 
-Make http request to get request headers back as response body
+Make http request to get request headers back as a response body
 ```sh
 curl 'http://localhost:8080/' --compressed
 ```
@@ -148,7 +147,7 @@ RoadRunner is highly customizable and extendable so you can even write your own 
 Custom encoders/decoders for faster json processing
 ---------------------------------------------------
 
-```python3
+```python
 from pygoridge.json import json_dumps, json_loads
 
 
@@ -167,7 +166,7 @@ Development
 
 ## Run tests
 
-```bash
+```sh
 docker-compose -f ./goridge/tests/docker-compose.yml up
 docker-compose -f tests/rr_test_app/docker-compose.yml up
 python3 -m unittest discover -s tests
