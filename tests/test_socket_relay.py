@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from pygoridge import SocketRelay, SocketType
+from pygoridge import SocketRelay
 from pygoridge.exceptions import InvalidArgumentException
 
 

@@ -1,10 +1,12 @@
 from functools import partial
 
 import ujson
-from pygoridge import create_relay, Worker, RPC
+from pygoridge import create_relay, Worker
 
 
-json_dumps = partial(ujson.dumps, ensure_ascii=False, escape_forward_slashes=False)
+json_dumps = partial(
+    ujson.dumps, ensure_ascii=False,
+    escape_forward_slashes=False)
 json_loads = ujson.loads
 
 
@@ -26,5 +28,5 @@ if __name__ == "__main__":
         response, response_headers = worker.hello(http_headers)
         worker.send(
            json_dumps(response).encode("utf-8"),
-           response_headers 
+           response_headers
         )

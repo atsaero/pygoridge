@@ -1,4 +1,3 @@
-import datetime
 import random
 from unittest import TestCase
 
@@ -21,7 +20,7 @@ class CommonTests:
 
     def make_rpc(self):
         return RPC(self.make_relay())
-        
+
     def test_manual_connect(self):
         relay = self.make_relay()
         conn = RPC(relay)
@@ -78,7 +77,7 @@ class CommonTests:
         payload = "a" * BUFFER_SIZE * 5
 
         with self.assertRaises(ServiceException):
-            resp = conn("Service.Echo", payload, flags=PayloadType.PAYLOAD_RAW)
+            conn("Service.Echo", payload, flags=PayloadType.PAYLOAD_RAW)
 
     def test_raw_body(self):
         conn = self.make_rpc()
@@ -117,16 +116,15 @@ class CommonTests:
         conn = self.make_rpc()
         msg = "{rawData} request for <*main.Payload Value>"
         with self.assertRaises(ServiceException) as e:
-            resp = conn("Service.Process", "raw", flags=PayloadType.PAYLOAD_RAW)
+            conn("Service.Process", "raw", flags=PayloadType.PAYLOAD_RAW)
             self.assertTrue(msg in str(e))
 
     def test_payload_with_map(self):
         conn = self.make_rpc()
-        resp = conn("Service.Process", 
-            {
-            "name": "wolfy-j", 
-            "value": 18,
-            "keys": {"key": "value", "email": "domain"}
+        resp = conn("Service.Process", {
+                "name": "wolfy-j",
+                "value": 18,
+                "keys": {"key": "value", "email": "domain"}
             })
         self.assertTrue(isinstance(resp["keys"], dict))
         self.assertEqual(resp["keys"]["value"], "key")
@@ -135,23 +133,22 @@ class CommonTests:
     def test_broken_payload_map(self):
         conn = self.make_rpc()
         with self.assertRaises(ServiceException):
-            resp = conn("Service.Process", 
-                {
-                "name": "wolfy-j", 
-                "value": 18,
-                "keys": 1111
+            conn("Service.Process", {
+                    "name": "wolfy-j",
+                    "value": 18,
+                    "keys": 1111
                 })
 
     def test_json_exception(self):
         conn = self.make_rpc()
         msg = "is not JSON serializable"
         with self.assertRaises(ServiceException) as e:
-            resp = conn("Service.Process", bytes())
+            conn("Service.Process", bytes())
             self.assertTrue(msg in str(e))
 
 
 class RPCTest(TestCase, CommonTests):
-    
+
     def test_context_manager(self):
         relay = self.make_relay()
         with RPC(relay) as conn:

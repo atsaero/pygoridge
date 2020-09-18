@@ -1,5 +1,5 @@
 from pygoridge import create_relay, Worker
-from pygoridge.json import json_loads, json_dumps
+from pygoridge.json import json_loads
 
 
 if __name__ == "__main__":

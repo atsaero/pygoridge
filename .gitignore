@@ -26,6 +26,4 @@ MANIFEST
 .idea/
 \.DS_Store
 .venv
-dict
 .tox
-*.c

@@ -1,5 +1,5 @@
 Pygoridge: Python-to-Golang IPC bridge, python client for Goridge
-=================================================
+=================================================================
 [![GoDoc](https://godoc.org/github.com/spiral/goridge?status.svg)](https://godoc.org/github.com/spiral/goridge)
 
 
@@ -26,6 +26,7 @@ $ pip install pygoridge
 
 Example: python client calls go server methods
 ----------------------------------------------
+
 ```python
 from pygoridge import create_relay, RPC, SocketRelay
 
@@ -35,9 +36,9 @@ rpc = RPC(SocketRelay("127.0.0.1", 6001))
 tcp_relay = create_relay("tcp://127.0.0.1:6001")
 unix_relay = create_relay("unix:///tmp/rpc.sock")
 stream_relay = create_relay("pipes")
- 
+
 print(rpc("App.Hi", "Antony"))
-rpc.close()     # close underlying socket connection 
+rpc.close()     # close underlying socket connection
 
 # or using as a context manager
 with RPC(tcp_relay) as rpc:
@@ -99,18 +100,19 @@ Worker class
 from functools import partial
 
 import ujson
-from pygoridge import create_relay, Worker, RPC
+from pygoridge import create_relay, Worker
 
 
-json_dumps = partial(ujson.dumps, ensure_ascii=False, escape_forward_slashes=False)
+json_dumps = partial(
+    ujson.dumps, ensure_ascii=False,
+    escape_forward_slashes=False)
 json_loads = ujson.loads
 
 
 class HTTPWorker(Worker):
 
     def hello(self, headers):
-        # You can call some CPU-intensive function here
-        return headers, {}
+        return headers, {"X-Server": "RoadRunner with python workers"}
 
 
 if __name__ == "__main__":
@@ -125,9 +127,8 @@ if __name__ == "__main__":
         response, response_headers = worker.hello(http_headers)
         worker.send(
            json_dumps(response).encode("utf-8"),
-           response_headers 
+           response_headers
         )
-
 ```
 
 Run RoadRunner server

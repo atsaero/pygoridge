@@ -19,6 +19,7 @@ setup(
     long_description=get_description(),
     license='MIT',
     packages=find_packages(exclude=("tests", "examples", "goridge")),
+    python_requires='>=3.6',
     zip_safe=False,
     classifiers=[
         'Development Status :: 4 - Beta',

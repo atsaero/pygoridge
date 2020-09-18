@@ -8,7 +8,7 @@ class RelayFactoryTest(TestCase):
 
     def test_format(self):
         formats = [
-            #format invalid
+            # format invalid
             ['tcp:localhost:', True],
             ['tcp:/localhost:', True],
             ['tcp//localhost:', True],
@@ -20,9 +20,9 @@ class RelayFactoryTest(TestCase):
             ['pipes://test:stdout', True],
             ['pipes://test:test', True],
             ['tcp://localhost:abc', True],
-            #unknown provider
+            # unknown provider
             ['test://localhost', True],
-            #valid format
+            # valid format
             ['tcp://localhost:123', False],
             ['unix://localhost:123', False],
             ['unix://rpc.sock', False],
@@ -33,10 +33,9 @@ class RelayFactoryTest(TestCase):
         for connection_format, assert_exception in formats:
             if assert_exception:
                 with self.assertRaises(RelayFactoryException):
-                    relay = create_relay(connection_format)
+                    create_relay(connection_format)
             else:
-                relay = create_relay(connection_format)
-
+                create_relay(connection_format)
 
     def test_tcp(self):
         relay = create_relay("tcp://localhost:0")
