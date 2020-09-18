@@ -61,16 +61,17 @@ func main() {
 		panic(err)
 	}
 
+	// See also https://roadrunner.dev/docs/library-standalone-usage
 	srv := roadrunner.NewServer(
-    &roadrunner.ServerConfig{
-        Command: "python3 worker.py",
-        Relay:   "pipes",
-        Pool: &roadrunner.Config{
-            NumWorkers:      int64(runtime.NumCPU()),
-            AllocateTimeout: time.Second,
-            DestroyTimeout:  time.Second,
-        },
-    })
+		&roadrunner.ServerConfig{
+			Command: "python3 worker.py",
+			Relay:   "pipes",
+			Pool: &roadrunner.Config{
+				NumWorkers:      int64(runtime.NumCPU()),
+				AllocateTimeout: time.Second,
+				DestroyTimeout:  time.Second,
+			},
+		})
 	defer srv.Stop()
 
 	err = srv.Start()
